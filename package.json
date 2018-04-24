@@ -1,0 +1,14 @@
+{
+  "name": "twitched",
+  "version": "1.0.0",
+  "description": "A website for creating themed word clouds of your Twitch.tv profile.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./src/server.js"
+  },
+  "author": "Jarrett Briody",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^5.1.1"
+  }
+}
