@@ -12,7 +12,7 @@ var index = fs.readFileSync(__dirname + "/../client/index.html");
 
 var channelJSON = undefined;
 
-var CLIENT_REDIRECT = "http://localhost";
+var CLIENT_REDIRECT = "https://twitchedapp.herokuapp.com/";
 //var USER_AUTH = undefined;
 var CLIENT_ID = "rqmzaob02j7xgmxu8hmj27hh19302q";
 var CLIENT_SECRET = "yletu5kuelihpt8z0oyhhhv5pp5sd0";
