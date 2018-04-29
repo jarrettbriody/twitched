@@ -9,6 +9,7 @@ var WebSocket = require('ws');
 var port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 var index = fs.readFileSync(__dirname + "/../client/index.html");
+var xImg = fs.readFileSync(__dirname + "/../client/media/xImg.png");
 
 var channelJSON = undefined;
 
@@ -36,6 +37,13 @@ var onRequest = function(request,response){
     
     if(parsedUrl.pathname === "/user") {
         requestTwitchUser(response, params, headers);
+    }
+
+    else if(parsedUrl.pathname === "/media"){
+        headers["Content-Type"] = "image/png";
+        response.writeHead(200,headers);
+        response.write(xImg);
+        response.end();
     }
     /*
     else if(parsedUrl.pathname === "/palette"){
