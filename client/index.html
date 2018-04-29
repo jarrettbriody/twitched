@@ -17,8 +17,7 @@
       $(document).ready(function() {
         if(chrome.runtime.lastError) chrome.runtime.lastError = null;
 
-        var xImgReg = document.querySelector("#xImgReg");
-        var xImgHover = document.querySelector("#xImgHover");
+        var xImg = document.querySelector("#xImg");
 
         var baseUrl = "https://twitchedapp.herokuapp.com";
 
@@ -60,20 +59,20 @@
               }
 
               var newButton = document.createElement("button");
-              newButton.type = "button";
+              //newButton.type = "button";
               newButton.name = json.users[0].display_name;
               newButton.onmouseover = function(e){
-                e.target.childNodes[0] = Object.assign({},xImgHover);
+                e.target.childNodes[0].style.opacity = "0.3";
               }
               newButton.onmouseleave = function(e){
-                e.target.childNodes[0] = Object.assign({},xImgReg);
+                e.target.childNodes[0].style.opacity = "1";
               }
               newButton.onclick = function(e){
                 var someStream = document.querySelector("#" + e.target.name);
                 embedDiv.removeChild(someStream);
                 embedDiv.removeChild(e.target);
               }
-              newButton.appendChild(Object.assign({},xImgReg));
+              newButton.appendChild(xImg.cloneNode(true));
               embedDiv.appendChild(newButton);
 
               if(document.querySelector("#showStream").checked){
@@ -121,7 +120,6 @@
     <div id="result"></div>
     <div id="twitch-embed"></div>
 
-    <img class="icons" id="xImgReg" src="media/xImgReg.png" alt="image not found" />
-    <img class="icons" id="xImgHover" src="media/xImgHover.png" alt="image not found" />
+    <img class="icons" id="xImg" src="media/xImg.png" alt="image not found" />
   </body>
 </html>
