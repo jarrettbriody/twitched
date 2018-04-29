@@ -9,6 +9,7 @@
     </style>
   </head>
   <body>
+    <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
       $(document).ready(function() {
@@ -36,6 +37,21 @@
               newImg.src = json.users[0].logo;
               document.querySelector("#result").appendChild(newImg);
 
+              var embed = new Twitch.Embed("twitch-embed", {
+                width: 854,
+                height: 480,
+                channel: json.users[0].display_name
+              });
+
+              var embedDiv = document.querySelector("#twitch-embed");
+              var chatIFrame = document.createElement("iframe");
+              chatIFrame.frameBorder = 0;
+              chatIFrame.scrolling = "yes";
+              chatIFrame.id = json.users[0].display_name;
+              chatIFrame.src = "https://www.twitch.tv/embed/" + json.users[0].display_name + "/chat";
+              chatIFrame.height = 500;
+              chatIFrame.width = 350;
+              embedDiv.appendChild(chatIFrame);
             },
             error: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
@@ -53,8 +69,7 @@
       <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "loltyler1">
       <input type="submit" value="Generate">
     </form>
-    <div id="result">
-    
-    </div>
+    <div id="result"></div>
+    <div id="twitch-embed"></div>
   </body>
 </html>
