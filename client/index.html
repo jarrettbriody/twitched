@@ -11,7 +11,7 @@
   <body>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
-      window.onload = function() {
+      $(document).ready(function() {
         if(chrome.runtime.lastError) chrome.runtime.lastError = null;
 
         var baseUrl = "https://twitchedapp.herokuapp.com";
@@ -47,7 +47,7 @@
           e.preventDefault();
           return false;
         });
-      };
+      });
     </script>
     <form id="userNameForm" action="/user" method="get">
       <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "loltyler1">

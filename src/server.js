@@ -93,7 +93,7 @@ function requestTwitchUser(response, params, returnHeader){
         twitchResponse.on('data', function(chunk) {
             channelJSON = JSON.parse(chunk);
             response.writeHead(200,returnHeader);
-            var colors = requestPictaculous(channelJSON.users[0].logo);
+            //var colors = requestPictaculous(channelJSON.users[0].logo);
             //channelJSON.profileColors = colors;
             response.write(JSON.stringify(chunk));
             response.end();
@@ -115,58 +115,6 @@ function requestTwitchUser(response, params, returnHeader){
     });
 
     twitchRequest.end();
-}
-
-function requestPictaculous(someImgSrc){
-    var imgUrl = url.parse(someImgSrc,false,true);
-    https.get({
-        protocol: imgUrl.protocol,
-        hostname: imgUrl.hostname,
-        path: imgUrl.path,
-        encoding: "base64"
-    }, 
-    function(someResponse){
-        someResponse.setEncoding('base64');
-        var chunks = [];
-        someResponse.on("data", function(chunkOfData){
-            chunks.push(Buffer.from(chunkOfData, 'base64'));
-        });
-        someResponse.on('end', function() {
-            //console.dir(someImageData);
-            var binaryImage = Buffer.concat(chunks);
-            //console.dir(binaryImage);//.toString("base64")
-            console.dir(Buffer.byteLength(binaryImage));
-            var options = {
-                protocol: "http:",
-                hostname: 'pictaculous.com',
-                path: '/api/1.0/',
-                method: 'POST',
-                encoding:null,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "POST",
-                    "Access-Control-Allow-Headers": "Content-Type",
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Content-Length': Buffer.from("image=").byteLength + binaryImage.byteLength //
-                }
-            };
-            var pictaculousRequest = http.request(options,function(pictaculousResponse){
-                pictaculousResponse.setEncoding('utf8');
-                pictaculousResponse.on('data', function(someJson){
-                    //var buffer = Buffer.concat(someJson).toString("base64");
-                    console.dir(someJson);
-                    //return someJson; //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% might not work due to timing, not sure
-                });
-            });
-            //console.dir(querystring.stringify({image:binaryImage.toString('binary')}));
-            console.dir(escape(binaryImage.toString('base64')));
-            //pictaculousRequest.write("image=");
-            pictaculousRequest.write(escape(Buffer.from("image=").toString('binary')) + escape(binaryImage.toString('binary')), 'binary');//tostring maybe i dont know 
-            //pictaculousRequest.write(querystring.stringify({image:binaryImage.toString('binary')}),'binary');//tostring maybe i dont know
-            pictaculousRequest.end(null,'binary');
-            //console.dir(someImageData);
-        });
-    });
 }
 
 function CC(username,password,channel){
