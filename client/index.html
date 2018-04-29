@@ -5,7 +5,9 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
-      
+      .icons{
+        display:none;
+      }
     </style>
   </head>
   <body>
@@ -15,9 +17,14 @@
       $(document).ready(function() {
         if(chrome.runtime.lastError) chrome.runtime.lastError = null;
 
+        var xImgReg = document.querySelector("#xImgReg");
+        var xImgHover = document.querySelector("#xImgHover");
+
         var baseUrl = "https://twitchedapp.herokuapp.com";
 
         var openedStreams = [];
+
+        var embedDiv = document.querySelector("#twitch-embed");
         
         $("#userNameForm").submit(function(e){
           var action = $("#userNameForm").attr("action");
@@ -32,12 +39,14 @@
             dataType: "json",
             success: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
-              $("#result").text(resultText);
               var json = JSON.parse(result);
               
+              /*
+              $("#result").text(resultText);
               var newImg = document.createElement("img");
               newImg.src = json.users[0].logo;
               document.querySelector("#result").appendChild(newImg);
+              */
 
               var t;
 
@@ -45,14 +54,32 @@
                 var s = openedStreams[i];
                 if(s == json.users[0].display_name){
                   var someStream = document.querySelector("#" + s);
-                  document.querySelector("#twitch-embed").removeChild(someStream);
+                  embedDiv.removeChild(someStream);
                   break;
                 }
               }
+
+              var newButton = document.createElement("button");
+              newButton.type = "button";
+              newButton.name = json.users[0].display_name;
+              newButton.onmouseover = function(e){
+                e.target.childNodes[0] = Object.assign({},xImgHover);
+              }
+              newButton.onmouseleave = function(e){
+                e.target.childNodes[0] = Object.assign({},xImgReg);
+              }
+              newButton.onclick = function(e){
+                var someStream = document.querySelector("#" + e.target.name);
+                embedDiv.removeChild(someStream);
+                embedDiv.removeChild(e.target);
+              }
+              newButton.appendChild(Object.assign({},xImgReg));
+              embedDiv.appendChild(newButton);
+
               if(document.querySelector("#showStream").checked){
                 var embedStreamDiv = document.createElement("div");
                 embedStreamDiv.id = json.users[0].display_name;
-                var embedDiv = document.querySelector("#twitch-embed").appendChild(embedStreamDiv);
+                embedDiv.appendChild(embedStreamDiv);
                 var embedStream = new Twitch.Embed(embedStreamDiv.id, {
                     width: 854,
                     height: 480,
@@ -93,5 +120,8 @@
     </form>
     <div id="result"></div>
     <div id="twitch-embed"></div>
+
+    <img class="icons" id="xImgReg" src="media/xImgReg.png" alt="image not found" />
+    <img class="icons" id="xImgHover" src="media/xImgHover.png" alt="image not found" />
   </body>
 </html>
