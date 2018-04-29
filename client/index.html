@@ -16,6 +16,8 @@
         if(chrome.runtime.lastError) chrome.runtime.lastError = null;
 
         var baseUrl = "https://twitchedapp.herokuapp.com";
+
+        var openedStreams = [];
         
         $("#userNameForm").submit(function(e){
           var action = $("#userNameForm").attr("action");
@@ -37,12 +39,23 @@
               newImg.src = json.users[0].logo;
               document.querySelector("#result").appendChild(newImg);
 
+              var t;
+
+              for(var i = 0; i < openedStreams.length; i++){
+                var s = openedStreams[i];
+                if(s == json.users[0].display_name){
+                  var someStream = document.querySelector("#" + s);
+                  document.querySelector("#twitch-embed").removeChild(someStream);
+                  break;
+                }
+              }
               if(document.querySelector("#showStream").checked){
                 var embed = new Twitch.Embed("twitch-embed", {
                     width: 854,
                     height: 480,
                     channel: json.users[0].display_name
                 });
+                embed.id = json.users[0].display_name;
               }
               else {
                 var embedDiv = document.querySelector("#twitch-embed");
@@ -55,6 +68,8 @@
                 chatIFrame.width = 350;
                 embedDiv.appendChild(chatIFrame);
               }
+
+              openedStreams.push(json.users[0].display_name);
             },
             error: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
