@@ -37,7 +37,7 @@
               newImg.src = json.users[0].logo;
               document.querySelector("#result").appendChild(newImg);
 
-              if(document.querySelector("#showStream").value != "on"){
+              if(document.querySelector("#showStream").checked){
                 var embed = new Twitch.Embed("twitch-embed", {
                     width: 854,
                     height: 480,
