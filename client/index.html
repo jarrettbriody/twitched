@@ -52,12 +52,12 @@
               if(document.querySelector("#showStream").checked){
                 var embedStreamDiv = document.createElement("div");
                 embedStreamDiv.id = json.users[0].display_name;
+                var embedDiv = document.querySelector("#twitch-embed").appendChild(embedStreamDiv);
                 var embedStream = new Twitch.Embed(embedStreamDiv.id, {
                     width: 854,
                     height: 480,
                     channel: json.users[0].display_name
                 });
-                var embedDiv = document.querySelector("#twitch-embed").appendChild(embedStreamDiv);
               }
               else {
                 var embedDiv = document.querySelector("#twitch-embed");
@@ -88,7 +88,7 @@
     <input id="showStream" type="checkbox">
     <label for="showStream">Show stream?</label>
     <form id="userNameForm" action="/user" method="get">
-      <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "loltyler1">
+      <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "sodapoppin">
       <input type="submit" value="Generate">
     </form>
     <div id="result"></div>
