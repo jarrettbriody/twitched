@@ -23,9 +23,7 @@
 
         var openedStreams = [];
 
-        var embedDiv = document.querySelector("#twitch-embed");
-
-        console.dir(embedDiv);
+        //console.dir(embedDiv);
         
         $("#userNameForm").submit(function(e){
           var action = $("#userNameForm").attr("action");
@@ -49,7 +47,7 @@
               document.querySelector("#result").appendChild(newImg);
               */
 
-              var t;
+              var embedDiv = document.querySelector("#twitch-embed");
 
               for(var i = 0; i < openedStreams.length; i++){
                 var s = openedStreams[i];
