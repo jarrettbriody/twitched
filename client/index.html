@@ -52,6 +52,7 @@
               chatIFrame.height = 500;
               chatIFrame.width = 350;
               embedDiv.appendChild(chatIFrame);
+              console.dir(chatIFrame);
             },
             error: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
