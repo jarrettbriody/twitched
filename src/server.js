@@ -39,11 +39,13 @@ var onRequest = function(request,response){
         requestTwitchUser(response, params, headers);
     }
 
-    else if(parsedUrl.pathname === "/media"){
-        headers["Content-Type"] = "image/png";
-        response.writeHead(200,headers);
-        response.write(xImg);
-        response.end();
+    else if(parsedUrl.pathname.includes("/media")){
+        if(parsedUrl.pathname.includes("/xImg")){
+            headers["Content-Type"] = "image/png";
+            response.writeHead(200,headers);
+            response.write(xImg);
+            response.end();
+        }
     }
     /*
     else if(parsedUrl.pathname === "/palette"){

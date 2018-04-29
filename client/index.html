@@ -71,6 +71,7 @@
                 var someStream = document.querySelector("#" + e.target.name);
                 embedDiv.removeChild(someStream);
                 embedDiv.removeChild(e.target);
+                openedStreams.splice(openedStreams.indexOf(e.target.name),1);
               }
               newButton.appendChild(xImg.cloneNode(true));
               embedDiv.appendChild(newButton);
