@@ -50,12 +50,14 @@
                 }
               }
               if(document.querySelector("#showStream").checked){
-                var embed = new Twitch.Embed("twitch-embed", {
+                var embedStreamDiv = document.createElement("div");
+                embedStreamDiv.id = json.users[0].display_name;
+                var embedStream = new Twitch.Embed(embedStreamDiv.id, {
                     width: 854,
                     height: 480,
                     channel: json.users[0].display_name
                 });
-                embed.id = json.users[0].display_name;
+                var embedDiv = document.querySelector("#twitch-embed").appendChild(embedStreamDiv);
               }
               else {
                 var embedDiv = document.querySelector("#twitch-embed");
