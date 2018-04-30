@@ -9,6 +9,7 @@
   "author": "Jarrett Briody",
   "license": "ISC",
   "dependencies": {
-    "ws": "^5.1.1"
+    "ws": "^5.1.1",
+    "xml2js": "^0.4.19"
   }
 }

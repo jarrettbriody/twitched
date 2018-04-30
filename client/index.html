@@ -5,8 +5,64 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
+      body{
+        background-color:rgb(75, 75, 75);
+        font-family: Helvetica, Arial, sans-serif;
+        color:white;
+        text-align:center;
+      }
       .icons{
         display:none;
+      }
+      .xButtons{
+        position:absolute;
+        right: 0;
+        top:0;
+        background-color:rgb(65, 65, 65);
+        transition:0.3s;
+        border: 2px solid red;
+      }
+      .labels{
+        font-size: 50px;
+        font-family: Helvetica, Arial, sans-serif;
+        text-align: center;
+        padding: 0px;
+        margin: 5px;
+        color:white;
+        text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+      }
+      .streamGroup{
+        background-color:gray;
+        border: 2px solid white;
+      }
+      #twitch-embed{
+        display:block;
+        position:relative;
+        text-align: center;
+      }
+      #userNameForm{
+        display:inline-block;
+      }
+      #userNameForm input{
+        display:block;
+        margin-right:auto;
+        margin-left:auto;
+        margin-top:8px;
+        margin-bottom:8px;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size:20px;
+      }
+      #showStreamDiv{
+        margin-top:8px;
+        margin-bottom:8px;
+      }
+      #showStreamDiv label{
+        display:inline-block;
+        font-size:20px;
+      }
+      #showStreamDiv input{
+        display:inline-block;
+        font-size:20px;
       }
     </style>
   </head>
@@ -19,7 +75,8 @@
 
         var xImg = document.querySelector("#xImg");
 
-        var baseUrl = "https://twitchedapp.herokuapp.com";
+        //var baseUrl = "https://twitchedapp.herokuapp.com";
+        var baseUrl = "http://localhost:3000";
 
         var openedStreams = [];
 
@@ -39,11 +96,12 @@
             success: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
               var json = JSON.parse(result);
+              console.dir(json);
               
               /*
               $("#result").text(resultText);
               var newImg = document.createElement("img");
-              newImg.src = json.users[0].logo;
+              newImg.src =  json.data[0].logo;
               document.querySelector("#result").appendChild(newImg);
               */
 
@@ -51,39 +109,80 @@
 
               for(var i = 0; i < openedStreams.length; i++){
                 var s = openedStreams[i];
-                if(s == json.users[0].display_name){
-                  var someStream = document.querySelector("#" + s);
-                  embedDiv.removeChild(someStream);
+                if(s ==  json.data[0].display_name){
+                  var someDiv = document.querySelector("#" + s);
+                  embedDiv.removeChild(someDiv);
+                  openedStreams.splice(openedStreams.indexOf(s),1);
                   break;
                 }
               }
 
+              var someNewEmbedDiv = document.createElement("div");
+              someNewEmbedDiv.id = json.data[0].display_name;
+              someNewEmbedDiv.style.display = "inline-block";
+              someNewEmbedDiv.style.position = "relative";
+              someNewEmbedDiv.style.margin = "10px";
+              someNewEmbedDiv.style.padding = "0px";
+              someNewEmbedDiv.style.transition = "0.5s";
+              someNewEmbedDiv.style.opacity = "0";
+              someNewEmbedDiv.classList.add("streamGroup");
+              embedDiv.appendChild(someNewEmbedDiv);
+
+              var newP = document.createElement("p");
+              newP.innerHTML = "<strong>" +  json.data[0].display_name + "</strong>";
+              newP.classList.add("labels");
+              someNewEmbedDiv.appendChild(newP);
+
               var newButton = document.createElement("button");
-              //newButton.type = "button";
-              newButton.name = json.users[0].display_name;
+              newButton.classList.add("xButtons");
               newButton.onmouseover = function(e){
+                e.stopPropagation();
                 e.target.childNodes[0].style.opacity = "0.3";
               }
               newButton.onmouseleave = function(e){
+                e.stopPropagation();
                 e.target.childNodes[0].style.opacity = "1";
               }
               newButton.onclick = function(e){
-                var someStream = document.querySelector("#" + e.target.name);
-                embedDiv.removeChild(someStream);
-                embedDiv.removeChild(e.target);
-                openedStreams.splice(openedStreams.indexOf(e.target.name),1);
-              }
-              newButton.appendChild(xImg.cloneNode(true));
-              embedDiv.appendChild(newButton);
+                e.stopPropagation();
+                //embedDiv.removeChild(e.target.parentElement);
+                openedStreams.splice(openedStreams.indexOf(e.target.parentElement.id),1);
+                $("#" + e.target.parentElement.id).fadeTo(500, 0, function(){
+                  embedDiv.removeChild(e.target.parentElement);
+                });
+                $.ajax({
+                    cache: false,
+                    type: "get",
+                    url: baseUrl + "/cancel",
+                    data: "name=" + encodeURIComponent(e.target.parentElement.id.toLowerCase()),
+                    dataType: "json",
+                    success: function (result, status, xhr) {
 
+                    },
+                    error: function (result, status, xhr) {
+                      var resultText = JSON.stringify(result);
+                      $("#result").text(resultText);
+                      console.dir(result);
+                    }
+                  });
+              }
+              var cloneOfImg = xImg.cloneNode(true);
+              cloneOfImg.classList.remove("icons");
+              cloneOfImg.style.pointerEvents = "none";
+              cloneOfImg.style.transition = "0.3s";
+              newButton.appendChild(cloneOfImg);
+              someNewEmbedDiv.appendChild(newButton);
+              
               if(document.querySelector("#showStream").checked){
                 var embedStreamDiv = document.createElement("div");
-                embedStreamDiv.id = json.users[0].display_name;
-                embedDiv.appendChild(embedStreamDiv);
+                embedStreamDiv.style.padding = "0px";
+                embedStreamDiv.style.margin = "0px";
+                embedStreamDiv.id =  json.data[0].display_name + "InnerDiv";
+                someNewEmbedDiv.appendChild(embedStreamDiv);
                 var embedStream = new Twitch.Embed(embedStreamDiv.id, {
-                    width: 854,
-                    height: 480,
-                    channel: json.users[0].display_name
+                    width: 900,
+                    height: 500,
+                    channel:  json.data[0].display_name
                 });
               }
               else {
@@ -91,14 +190,14 @@
                 var chatIFrame = document.createElement("iframe");
                 chatIFrame.frameBorder = 0;
                 chatIFrame.scrolling = "yes";
-                chatIFrame.id = json.users[0].display_name;
-                chatIFrame.src = "https://www.twitch.tv/embed/" + json.users[0].display_name + "/chat";
+                chatIFrame.id =  json.data[0].display_name;
+                chatIFrame.src = "https://www.twitch.tv/embed/" +  json.data[0].display_name + "/chat";
                 chatIFrame.height = 500;
                 chatIFrame.width = 350;
-                embedDiv.appendChild(chatIFrame);
+                someNewEmbedDiv.appendChild(chatIFrame);
               }
-
-              openedStreams.push(json.users[0].display_name);
+              $("#" + json.data[0].display_name).fadeTo(500, 1);
+              openedStreams.push( json.data[0].display_name);
             },
             error: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
@@ -110,17 +209,44 @@
           e.preventDefault();
           return false;
         });
+
+        window.onbeforeunload = function(){
+          for(var i = 0; i < openedStreams.length; i++){
+            $.ajax({
+              cache: false,
+              type: "get",
+              url: baseUrl + "/cancel",
+              data: "name=" + encodeURIComponent(openedStreams[i].toLowerCase()),
+              dataType: "json",
+              success: function (result, status, xhr) {
+                //var resultText = JSON.stringify(result);
+                //var json = JSON.parse(result);
+              },
+              error: function (result, status, xhr) {
+                var resultText = JSON.stringify(result);
+                $("#result").text(resultText);
+                console.dir(result);
+                //$("#result").text(result.responseJSON.error);
+              }
+            });
+          }
+          openedStreams = [];
+          return null;
+        }
       });
     </script>
-    <input id="showStream" type="checkbox">
-    <label for="showStream">Show stream?</label>
+    <h1>Twitched</h1>
     <form id="userNameForm" action="/user" method="get">
-      <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "sodapoppin">
+      <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "jarrettbriody">
+      <div id="showStreamDiv">
+          <input id="showStream" type="checkbox">
+          <label for="showStream">Show stream</label>
+      </div>
       <input type="submit" value="Generate">
     </form>
     <div id="result"></div>
     <div id="twitch-embed"></div>
 
-    <img class="icons" id="xImg" src="https://twitchedapp.herokuapp.com/media/xImg.png" alt="image not found" />
+    <img class="icons" id="xImg" src="http://localhost:3000/media/xImg.png" alt="image not found" />
   </body>
 </html>
