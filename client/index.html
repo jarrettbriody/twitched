@@ -235,15 +235,17 @@
         }
       });
     </script>
-    <h1>Twitched</h1>
+    <h1>Twitched_Bot</h1>
     <form id="userNameForm" action="/user" method="get">
       <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "jarrettbriody">
       <div id="showStreamDiv">
           <input id="showStream" type="checkbox">
           <label for="showStream">Show stream</label>
       </div>
-      <input type="submit" value="Generate">
+      <input type="submit" value="Start bot">
     </form>
+    <p>Commands</p>
+    <p>!filter &lt;new filter word&gt;  |  !roll &lt;some number&gt;  |  !followage &lt;some target username&gt;</p>
     <div id="result"></div>
     <div id="twitch-embed"></div>
 
