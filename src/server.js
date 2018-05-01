@@ -17,6 +17,7 @@ var port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 var index = fs.readFileSync(__dirname + "/../client/index.html");
 var xImg = fs.readFileSync(__dirname + "/../client/media/xImg.png");
+var twitchyTV = fs.readFileSync(__dirname + "/../client/fonts/TwitchyTV.otf");
 
 var channelJSON = undefined;
 
@@ -102,6 +103,16 @@ var onRequest = function(request,response){
             headers["Content-Type"] = "image/png";
             response.writeHead(200,headers);
             response.write(xImg, 'base64');
+            response.end();
+        }
+    }
+
+    //if a font is being requested, only used for twitchy
+    else if(parsedUrl.pathname.includes("/fonts")){
+        if(parsedUrl.pathname.includes("/TwitchyTV")){
+            headers["Content-Type"] = "font/opentype";
+            response.writeHead(200,headers);
+            response.write(twitchyTV);
             response.end();
         }
     }
