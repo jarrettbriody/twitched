@@ -110,7 +110,7 @@ var onRequest = function(request,response){
     //if a font is being requested, only used for twitchy
     else if(parsedUrl.pathname.includes("/fonts")){
         if(parsedUrl.pathname.includes("/TwitchyTV")){
-            headers["Content-Type"] = "font/opentype";
+            headers["Content-Type"] = "application/font-sfnt";
             response.writeHead(200,headers);
             response.write(twitchyTV);
             response.end();
