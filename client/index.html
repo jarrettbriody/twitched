@@ -44,6 +44,7 @@
         display:inline-block;
         border: 2px solid white;
         padding: 1em;
+        margin-bottom: 1.0em;
       }
       #userNameForm input{
         display:block;
@@ -72,7 +73,10 @@
     <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
+      "use strict";
+      //when the page is ready
       $(document).ready(function() {
+        //i dont think this is actually relevant anymore, was having weird issue but i'm gonna leave it here
         if(chrome.runtime.lastError) chrome.runtime.lastError = null;
 
         var xImg = document.querySelector("#xImg");
@@ -81,14 +85,13 @@
         //var baseUrl = "http://localhost:3000";
 
         var openedStreams = [];
-
-        //console.dir(embedDiv);
         
+        //when the user submits a twitch username
         $("#userNameForm").submit(function(e){
           var action = $("#userNameForm").attr("action");
           var name = "name=" + encodeURIComponent($("#userName").val());
           name = name.toLowerCase();
-          //console.log("HELLOOOOO: " + baseUrl + action + name);
+          //send the ajax call
           $.ajax({
             cache: false,
             type: "get",
@@ -98,20 +101,21 @@
             success: function (result, status, xhr) {
               var resultText = JSON.stringify(result);
               var json = JSON.parse(result);
-              console.dir(json);
-              
-              /*
-              $("#result").text(resultText);
-              var newImg = document.createElement("img");
-              newImg.src =  json.data[0].logo;
-              document.querySelector("#result").appendChild(newImg);
-              */
 
+              //if the user sent doesnt exist
+              if(json.data.length == 0){
+                $("#userName").val(function(){return "Enter a valid username."});
+                console.log("You must enter a valid Twitch username.");
+                return;
+              }
+              
+              //start forming the embedded stream and chat
               var embedDiv = document.querySelector("#twitch-embed");
 
+              //if the stream is already open, close it and create a new one later, websocket on server will stay the same
               for(var i = 0; i < openedStreams.length; i++){
                 var s = openedStreams[i];
-                if(s ==  json.data[0].display_name){
+                if(s == json.data[0].display_name){
                   var someDiv = document.querySelector("#" + s);
                   embedDiv.removeChild(someDiv);
                   openedStreams.splice(openedStreams.indexOf(s),1);
@@ -119,22 +123,25 @@
                 }
               }
 
+              //outer box for embed contents, goes inside greater embedDiv box
               var someNewEmbedDiv = document.createElement("div");
               someNewEmbedDiv.id = json.data[0].display_name;
               someNewEmbedDiv.style.display = "inline-block";
               someNewEmbedDiv.style.position = "relative";
               someNewEmbedDiv.style.margin = "10px";
               someNewEmbedDiv.style.padding = "0px";
-              someNewEmbedDiv.style.transition = "0.5s";
+              //someNewEmbedDiv.style.transition = "0.5s";
               someNewEmbedDiv.style.opacity = "0";
               someNewEmbedDiv.classList.add("streamGroup");
               embedDiv.appendChild(someNewEmbedDiv);
 
+              //username label
               var newP = document.createElement("p");
               newP.innerHTML = "<strong>" +  json.data[0].display_name + "</strong>";
               newP.classList.add("labels");
               someNewEmbedDiv.appendChild(newP);
 
+              //create the x button to close the stream
               var newButton = document.createElement("button");
               newButton.classList.add("xButtons");
               newButton.onmouseover = function(e){
@@ -145,9 +152,9 @@
                 e.stopPropagation();
                 e.target.childNodes[0].style.opacity = "1";
               }
+              //when the button is clicked, remove the button, embedded stream, and send an ajax call to the server to tell it to close the websocket
               newButton.onclick = function(e){
                 e.stopPropagation();
-                //embedDiv.removeChild(e.target.parentElement);
                 openedStreams.splice(openedStreams.indexOf(e.target.parentElement.id),1);
                 $("#" + e.target.parentElement.id).fadeTo(500, 0, function(){
                   embedDiv.removeChild(e.target.parentElement);
@@ -164,10 +171,11 @@
                     error: function (result, status, xhr) {
                       var resultText = JSON.stringify(result);
                       $("#result").text(resultText);
-                      console.dir(result);
                     }
                   });
               }
+
+              //put the x image on the button
               var cloneOfImg = xImg.cloneNode(true);
               cloneOfImg.classList.remove("icons");
               cloneOfImg.style.pointerEvents = "none";
@@ -175,6 +183,7 @@
               newButton.appendChild(cloneOfImg);
               someNewEmbedDiv.appendChild(newButton);
               
+              //if the user wants the stream shown with the chat
               if(document.querySelector("#showStream").checked){
                 var embedStreamDiv = document.createElement("div");
                 embedStreamDiv.style.padding = "0px";
@@ -187,6 +196,7 @@
                     channel:  json.data[0].display_name
                 });
               }
+              //if the user just wants the chat
               else {
                 var embedDiv = document.querySelector("#twitch-embed");
                 var chatIFrame = document.createElement("iframe");
@@ -205,13 +215,13 @@
               var resultText = JSON.stringify(result);
               $("#result").text(resultText);
               console.dir(result);
-              //$("#result").text(result.responseJSON.error);
             }
           });
           e.preventDefault();
           return false;
         });
 
+        //when the window is unloaded, calls need to be made to the server to close the websockets if they exist
         window.onbeforeunload = function(){
           for(var i = 0; i < openedStreams.length; i++){
             $.ajax({
@@ -221,14 +231,12 @@
               data: "name=" + encodeURIComponent(openedStreams[i].toLowerCase()),
               dataType: "json",
               success: function (result, status, xhr) {
-                //var resultText = JSON.stringify(result);
-                //var json = JSON.parse(result);
+                
               },
               error: function (result, status, xhr) {
                 var resultText = JSON.stringify(result);
                 $("#result").text(resultText);
                 console.dir(result);
-                //$("#result").text(result.responseJSON.error);
               }
             });
           }
@@ -239,7 +247,8 @@
     </script>
     <h1>Twitched_Bot</h1>
     <h3>Commands</h3>
-    <h5>!filter &lt;new filter word&gt;&emsp;|&emsp;!roll &lt;some number&gt;&emsp;|&emsp;!followage &lt;some target username&gt;</h5>
+    <h5>!filter &lt;filter word&gt;&emsp;|&emsp;!unfilter &lt;filter word&gt;&emsp;|&emsp;!clearfilter&emsp;|&emsp;!roll &lt;number&gt;&emsp;|&emsp;!followage &lt;target twitch username&gt;</h5>
+    <h5>!lol rank &lt;summoner name&gt;&emsp;|&emsp;!lol level &lt;summoner name&gt;&emsp;|&emsp;!lol main &lt;summoner name&gt;&emsp;|&emsp;!lol winratio &lt;summoner name&gt;</h5>
     <form id="userNameForm" action="/user" method="get">
       <input id="userName" type="text" name="name" placeholder="Twitch Username" value = "jarrettbriody">
       <div id="showStreamDiv">
@@ -251,6 +260,6 @@
     <div id="result"></div>
     <div id="twitch-embed"></div>
 
-    <img class="icons" id="xImg" src="https://twitchedbot.herokuapp.com/media/xImg.png" alt="image not found" />
+    <img class="icons" id="xImg" src="https://twitchedbot.herokuapp.com/media/xImg.png" alt="image not found" /><!-- http://localhost:3000/media/xImg.png -->
   </body>
 </html>
