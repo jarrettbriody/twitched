@@ -99,7 +99,6 @@
         
         //when the user submits a twitch username
         $("#userNameForm").submit(function(e){
-          e.stopPropagation();
           var action = $("#userNameForm").attr("action");
           var name = "name=" + encodeURIComponent($("#userName").val());
           name = name.toLowerCase();
@@ -156,26 +155,26 @@
               //create the x button to close the stream
               var newButton = document.createElement("button");
               newButton.classList.add("xButtons");
-              newButton.onmouseover = function(e){
-                e.stopPropagation();
-                e.target.childNodes[0].style.opacity = "0.3";
+              newButton.onmouseover = function(e2){
+                e2.stopPropagation();
+                e2.target.childNodes[0].style.opacity = "0.3";
               }
-              newButton.onmouseleave = function(e){
-                e.stopPropagation();
-                e.target.childNodes[0].style.opacity = "1";
+              newButton.onmouseleave = function(e2){
+                e2.stopPropagation();
+                e2.target.childNodes[0].style.opacity = "1";
               }
               //when the button is clicked, remove the button, embedded stream, and send an ajax call to the server to tell it to close the websocket
-              newButton.onclick = function(e){
-                e.stopPropagation();
-                openedStreams.splice(openedStreams.indexOf(e.target.parentElement.id),1);
-                $("#" + e.target.parentElement.id).fadeTo(500, 0, function(){
-                  embedDiv.removeChild(e.target.parentElement);
+              newButton.onclick = function(e2){
+                e2.stopPropagation();
+                openedStreams.splice(openedStreams.indexOf(e2.target.parentElement.id),1);
+                $("#" + e2.target.parentElement.id).fadeTo(500, 0, function(){
+                  embedDiv.removeChild(e2.target.parentElement);
                 });
                 $.ajax({
                     cache: false,
                     type: "get",
                     url: baseUrl + "/cancel",
-                    data: "name=" + encodeURIComponent(e.target.parentElement.id.toLowerCase()),
+                    data: "name=" + encodeURIComponent(e2.target.parentElement.id.toLowerCase()),
                     dataType: "json",
                     success: function (result, status, xhr) {
 
@@ -230,6 +229,7 @@
             }
           });
           e.preventDefault();
+          e.stopPropagation();
           return false;
         });
 
