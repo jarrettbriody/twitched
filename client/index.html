@@ -99,6 +99,7 @@
         
         //when the user submits a twitch username
         $("#userNameForm").submit(function(e){
+          e.stopPropagation();
           var action = $("#userNameForm").attr("action");
           var name = "name=" + encodeURIComponent($("#userName").val());
           name = name.toLowerCase();
